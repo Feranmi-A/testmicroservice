@@ -9,7 +9,7 @@ app.secret_key = os.environ.get('SECRET_KEY')
 app.config['MONGO_URI'] = os.environ.get('MONGO_URI')
 mongo = PyMongo(app)
 
-@app.route('/banking/register', methods=['GET', 'POST'])
+@app.route('/banking/templates/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         first_name = request.form.get('first_name')
@@ -32,7 +32,7 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html')
 
-@app.route('/banking/login', methods=['GET', 'POST'])
+@app.route('/banking/templates/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         email = request.form.get('email')
@@ -45,14 +45,14 @@ def login():
         return redirect(url_for('login'))
     return render_template('login.html')
 
-@app.route('/banking/dashboard')
+@app.route('/banking/templates/dashboard')
 def dashboard():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     user = mongo.db.users.find_one({'_id': ObjectId(session['user_id'])})
     return render_template('dashboard.html', user=user)
 
-@app.route('/banking/deposit', methods=['POST'])
+@app.route('/banking/templates/deposit', methods=['POST'])
 def deposit():
     if 'user_id' not in session:
         return redirect(url_for('login'))
@@ -75,7 +75,7 @@ def deposit():
     flash('Deposit successful', 'success')
     return redirect(url_for('dashboard'))
 
-@app.route('/banking/withdraw', methods=['POST'])
+@app.route('/banking/templates/withdraw', methods=['POST'])
 def withdraw():
     if 'user_id' not in session:
         return redirect(url_for('login'))
@@ -99,7 +99,7 @@ def withdraw():
     flash('Withdrawal successful', 'success')
     return redirect(url_for('dashboard'))
 
-@app.route('/banking/logout')
+@app.route('/banking/templates/logout')
 def logout():
     session.pop('user_id', None)
     flash('Logged out', 'info')
