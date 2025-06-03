@@ -1,0 +1,52 @@
+version: '3.8'
+services:
+  nginx:
+    image: nginx:stable-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ../microservices/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../microservices/portfolio/public:/usr/share/nginx/html:ro
+
+    depends_on:
+      - module5
+      - transaction
+      - banking
+
+  module5:
+    build:
+      context: ../microservices/module5
+      dockerfile: Dockerfile
+    environment:
+      - MONGO_URI=${MONGO_URI}
+    expose:
+      - "3000"
+
+  transaction:
+    build:
+      context: ../microservices/transaction
+      dockerfile: Dockerfile
+    volumes:
+      - ../microservices/transaction/output:/app/output
+    expose:
+      - "5001"
+
+  banking:
+    build:
+      context: ../microservices/banking
+      dockerfile: Dockerfile
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - SECRET_KEY=${SECRET_KEY}
+    expose:
+      - "5002"
+
+  mongo:
+    image: mongo:6
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
+
+volumes:
+  mongo_data:
